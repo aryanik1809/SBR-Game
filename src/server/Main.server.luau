@@ -158,6 +158,34 @@ local function buildProps(map: Folder)
 	end
 end
 
+local function buildLandmarks(map: Folder)
+	local folder = Instance.new("Folder")
+	folder.Name = "Landmarks"
+	folder.Parent = map
+	for _, item in MapData.Landmarks do
+		SpriteFactory.create(Assets.Sprites[item.name], Vector3.new(item.x, 0, item.z), item.scale, folder)
+	end
+end
+
+local function buildBorder(map: Folder)
+	local folder = Instance.new("Folder")
+	folder.Name = "Border"
+	folder.Parent = map
+	local rng = Random.new(MapData.Seed + 1)
+	local b = MapData.Border
+	local def = Assets.Sprites[b.name]
+	local d = b.distance
+	local n = math.floor(d * 2 / b.spacing)
+	for i = 0, n do
+		local t = -d + i * b.spacing
+		-- Sides are placed in z order so nearer cliffs draw in front of farther ones.
+		for _, pos in { Vector3.new(t, 0, -d), Vector3.new(-d, 0, t), Vector3.new(d, 0, t), Vector3.new(t, 0, d) } do
+			local jitter = Vector3.new(rng:NextNumber(-6, 6), 0, rng:NextNumber(-6, 6))
+			SpriteFactory.create(def, pos + jitter, rng:NextNumber(b.scale[1], b.scale[2]), folder)
+		end
+	end
+end
+
 local function buildSpawn(map: Folder)
 	local spawn = Instance.new("SpawnLocation")
 	spawn.Anchored = true
@@ -177,6 +205,8 @@ map.Parent = workspace
 buildGround(map)
 buildTrail(map)
 buildProps(map)
+buildLandmarks(map)
+buildBorder(map)
 buildSpawn(map)
 
 local function onCharacter(character: Model)

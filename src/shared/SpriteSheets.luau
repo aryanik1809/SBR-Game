@@ -25,4 +25,49 @@ return {
 		rect = { x = 636, y = 426, w = 275, h = 483 },
 		ppu = 46, ax = 137, collide = 1.5,
 	},
+	["bones_skull"] = {
+		image = "rbxassetid://124875629860707",
+		rect = { x = 33, y = 9, w = 903, h = 747 },
+		ppu = 110, ax = 451, collide = nil,
+	},
+	["bones_ribcage"] = {
+		image = "rbxassetid://124875629860707",
+		rect = { x = 496, y = 424, w = 744, h = 564 },
+		ppu = 110, ax = 372, collide = nil,
+	},
+	["bones_pile"] = {
+		image = "rbxassetid://124875629860707",
+		rect = { x = 71, y = 812, w = 625, h = 414 },
+		ppu = 110, ax = 312, collide = nil,
+	},
+	["cactus_pricklypear"] = {
+		image = "rbxassetid://128913055222911",
+		rect = { x = 31, y = 40, w = 649, h = 832 },
+		ppu = 58, ax = 324, collide = 3,
+	},
+	["cactus_barrel"] = {
+		image = "rbxassetid://128913055222911",
+		rect = { x = 620, y = 540, w = 619, h = 661 },
+		ppu = 58, ax = 309, collide = 3.5,
+	},
+	["camp_fire"] = {
+		image = "rbxassetid://90547185989154",
+		rect = { x = 19, y = 7, w = 689, h = 621 },
+		ppu = 75, ax = 344, collide = 3,
+	},
+	["camp_bedroll"] = {
+		image = "rbxassetid://90547185989154",
+		rect = { x = 648, y = 111, w = 598, h = 461 },
+		ppu = 150, ax = 299, collide = nil,
+	},
+	["camp_saddle"] = {
+		image = "rbxassetid://90547185989154",
+		rect = { x = 320, y = 556, w = 844, h = 683 },
+		ppu = 170, ax = 422, collide = nil,
+	},
+	["mesa_cliff"] = {
+		image = "rbxassetid://91142423924144",
+		rect = { x = 9, y = 97, w = 1234, h = 1059 },
+		ppu = 18, ax = 617, collide = 30,
+	},
 }

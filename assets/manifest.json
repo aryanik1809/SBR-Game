@@ -4,21 +4,101 @@
       "file": "boulders.png",
       "id": 96157348145725,
       "ppu": 34,
-      "names": ["boulder_large", "boulder_medium", "boulder_small"],
+      "names": [
+        "boulder_large",
+        "boulder_medium",
+        "boulder_small"
+      ],
       "overrides": {
-        "boulder_large": { "collide": 6 },
-        "boulder_medium": { "collide": 4 },
-        "boulder_small": { "collide": 2.5 }
+        "boulder_large": {
+          "collide": 6
+        },
+        "boulder_medium": {
+          "collide": 4
+        },
+        "boulder_small": {
+          "collide": 2.5
+        }
       }
     },
     "cacti": {
       "file": "cacti.png",
       "id": 108445753609206,
       "ppu": 46,
-      "names": ["cactus_tall", "cactus_small"],
+      "names": [
+        "cactus_tall",
+        "cactus_small"
+      ],
       "overrides": {
-        "cactus_tall": { "collide": 2 },
-        "cactus_small": { "collide": 1.5 }
+        "cactus_tall": {
+          "collide": 2
+        },
+        "cactus_small": {
+          "collide": 1.5
+        }
+      }
+    },
+    "bones": {
+      "file": "bones.png",
+      "id": 124875629860707,
+      "ppu": 110,
+      "names": [
+        "bones_skull",
+        "bones_ribcage",
+        "bones_pile"
+      ]
+    },
+    "pricklypear_barrel": {
+      "file": "pricklypear_barrel.png",
+      "id": 128913055222911,
+      "ppu": 58,
+      "merge": 1,
+      "names": [
+        "cactus_pricklypear",
+        "cactus_barrel"
+      ],
+      "overrides": {
+        "cactus_pricklypear": {
+          "collide": 3
+        },
+        "cactus_barrel": {
+          "collide": 3.5
+        }
+      }
+    },
+    "camping": {
+      "file": "camping.png",
+      "id": 90547185989154,
+      "ppu": 75,
+      "merge": 0,
+      "names": [
+        "camp_fire",
+        "camp_bedroll",
+        "camp_saddle"
+      ],
+      "overrides": {
+        "camp_fire": {
+          "collide": 3
+        },
+        "camp_bedroll": {
+          "ppu": 150
+        },
+        "camp_saddle": {
+          "ppu": 170
+        }
+      }
+    },
+    "mesa_cliff": {
+      "file": "mesa_cliff.png",
+      "id": 91142423924144,
+      "ppu": 18,
+      "names": [
+        "mesa_cliff"
+      ],
+      "overrides": {
+        "mesa_cliff": {
+          "collide": 30
+        }
       }
     }
   }

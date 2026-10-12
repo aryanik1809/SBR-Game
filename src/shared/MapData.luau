@@ -27,6 +27,26 @@ return {
 			{ name = "boulder_large", weight = 1.5, scale = { 0.8, 1.6 } },
 			{ name = "boulder_medium", weight = 3, scale = { 0.8, 1.3 } },
 			{ name = "boulder_small", weight = 4, scale = { 0.8, 1.4 } },
+			{ name = "cactus_pricklypear", weight = 2.5, scale = { 0.8, 1.2 } },
+			{ name = "cactus_barrel", weight = 2.5, scale = { 0.8, 1.2 } },
+			{ name = "bones_skull", weight = 0.5, scale = { 0.8, 1.1 } },
+			{ name = "bones_ribcage", weight = 0.4, scale = { 0.8, 1.1 } },
+			{ name = "bones_pile", weight = 0.6, scale = { 0.8, 1.2 } },
 		},
+	},
+
+	-- Hand-placed set pieces. x/z in studs.
+	Landmarks = {
+		{ name = "camp_fire", x = -95, z = 175, scale = 1 },
+		{ name = "camp_bedroll", x = -78, z = 188, scale = 1 },
+		{ name = "camp_saddle", x = -112, z = 190, scale = 1 },
+	},
+
+	-- Tall cliffs ringing the map so the edge of the world looks intentional.
+	Border = {
+		name = "mesa_cliff",
+		distance = 540, -- from the map centre
+		spacing = 58,
+		scale = { 0.95, 1.25 },
 	},
 }

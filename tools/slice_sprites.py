@@ -49,12 +49,12 @@ def label(mask: np.ndarray) -> np.ndarray:
     return labels
 
 
-def find_boxes(img: Image.Image):
+def find_boxes(img: Image.Image, merge: int = MERGE):
     alpha = np.array(img.convert("RGBA"))[:, :, 3] > ALPHA_MIN
     h, w = alpha.shape
     small = alpha[: h // DOWN * DOWN, : w // DOWN * DOWN]
     small = small.reshape(h // DOWN, DOWN, w // DOWN, DOWN).any(axis=(1, 3))
-    labels = label(dilate(small, MERGE))
+    labels = label(dilate(small, merge))
     boxes = []
     for i in range(1, labels.max() + 1):
         ys, xs = np.where((labels == i) & small)
@@ -86,7 +86,7 @@ def main() -> int:
             print(f"skip {sheet}: {path.name} not found")
             continue
         img = Image.open(path).convert("RGBA")
-        boxes = find_boxes(img)
+        boxes = find_boxes(img, cfg.get("merge", MERGE))
         names = cfg.get("names", [])
         if names and len(names) != len(boxes):
             print(f"WARNING {sheet}: found {len(boxes)} objects but manifest lists {len(names)} names")
