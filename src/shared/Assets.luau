@@ -22,37 +22,11 @@ Assets.TrailEdge = {
 	dirtFraction = 0.55,
 }
 
--- Sprites cut from a larger sheet. `rect` is in pixels of the 1024x1024 source image.
--- `ppu` = source pixels per stud (bigger = smaller in the world).
--- `ax` = pixel x (relative to rect) of the object's base, used to stand it on the ground.
--- `collide` = radius in studs of an invisible blocker, nil for walk-through.
-Assets.Sprites = {
-	cactus_tall = {
-		image = img(108445753609206),
-		rect = { x = 120, y = 115, w = 480, h = 805 },
-		ppu = 46, ax = 250, collide = 2,
-	},
-	cactus_small = {
-		image = img(108445753609206),
-		rect = { x = 630, y = 425, w = 285, h = 490 },
-		ppu = 46, ax = 100, collide = 1.5,
-	},
-	boulder_large = {
-		image = img(96157348145725),
-		rect = { x = 110, y = 120, w = 510, h = 435 },
-		ppu = 34, ax = 220, collide = 6,
-	},
-	boulder_medium = {
-		image = img(96157348145725),
-		rect = { x = 570, y = 445, w = 375, h = 330 },
-		ppu = 34, ax = 160, collide = 4,
-	},
-	boulder_small = {
-		image = img(96157348145725),
-		rect = { x = 240, y = 640, w = 265, h = 280 },
-		ppu = 34, ax = 140, collide = 2.5,
-	},
-}
+-- Sprites are cut from sheets automatically: add the PNG + Roblox ID to assets/manifest.json,
+-- run `python3 tools/slice_sprites.py`, and they appear here via the generated SpriteSheets module.
+-- Each entry: image, rect (pixels in the source image), ppu (pixels per stud),
+-- ax (pixel x of the base inside rect), collide (blocker radius in studs, nil = walk-through).
+Assets.Sprites = require(script.Parent.SpriteSheets)
 
 -- Uploaded but not placed yet. I need to see each image to cut it into sprites
 -- (drop the PNGs into /assets in the repo, or paste them into the chat).

@@ -1,0 +1,25 @@
+{
+  "sheets": {
+    "boulders": {
+      "file": "boulders.png",
+      "id": 96157348145725,
+      "ppu": 34,
+      "names": ["boulder_large", "boulder_medium", "boulder_small"],
+      "overrides": {
+        "boulder_large": { "collide": 6 },
+        "boulder_medium": { "collide": 4 },
+        "boulder_small": { "collide": 2.5 }
+      }
+    },
+    "cacti": {
+      "file": "cacti.png",
+      "id": 108445753609206,
+      "ppu": 46,
+      "names": ["cactus_tall", "cactus_small"],
+      "overrides": {
+        "cactus_tall": { "collide": 2 },
+        "cactus_small": { "collide": 1.5 }
+      }
+    }
+  }
+}

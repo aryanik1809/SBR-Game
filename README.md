@@ -18,3 +18,10 @@ Steel Ball Run racing game for Roblox. Fixed angled camera, 2D sprite map, 3D pl
 - `src/client/Camera.client.luau` – fixed follow camera
 - `assets/` – put source PNGs here
 - `docs/asset-prompts.md` – ChatGPT prompts for new art
+
+## Adding new sprites
+
+1. Save the PNG in `assets/` and add it to `assets/manifest.json` (file, Roblox ID, pixels-per-stud, names).
+2. `python3 tools/slice_sprites.py` (needs `numpy` and `pillow`).
+3. Check `assets/_preview/<sheet>.png` to confirm the numbered boxes match the names.
+4. Use the names in `src/shared/MapData.luau`.
