@@ -17,6 +17,8 @@ Steel Ball Run racing game for Roblox. Fixed angled camera, 2D sprite map, 3D pl
 - `src/server/Main.server.luau` – builds the map
 - `src/client/Camera.client.luau` – fixed follow camera
 - `assets/` – put source PNGs here
+- `assets/horse/` – 3D horse (Blender-built, rigged, PBR textured); see its README
+- `tools/build_horse.py` – regenerates the horse model and textures with `bpy`
 - `docs/asset-prompts.md` – ChatGPT prompts for new art
 
 ## Adding new sprites
