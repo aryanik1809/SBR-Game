@@ -209,9 +209,29 @@ buildLandmarks(map)
 buildBorder(map)
 buildSpawn(map)
 
+-- The Humanoid character is just the physics body now: the client draws a horse and rider over it,
+-- so the default avatar (and its name/health bar) is hidden.
+local function hideAvatar(character: Model)
+	local function hide(d: Instance)
+		if d:IsA("BasePart") then
+			d.Transparency = 1
+			d.CastShadow = false
+		elseif d:IsA("Decal") or d:IsA("Texture") then
+			d.Transparency = 1
+		end
+	end
+	for _, d in character:GetDescendants() do
+		hide(d)
+	end
+	character.DescendantAdded:Connect(hide)
+end
+
 local function onCharacter(character: Model)
 	local humanoid = character:WaitForChild("Humanoid") :: Humanoid
 	humanoid.WalkSpeed = Config.Player.WalkSpeed
+	humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+	humanoid.HealthDisplayType = Enum.HumanoidHealthDisplayType.AlwaysOff
+	hideAvatar(character)
 end
 Players.PlayerAdded:Connect(function(player)
 	player.CharacterAdded:Connect(onCharacter)

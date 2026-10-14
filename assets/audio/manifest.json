@@ -1,0 +1,262 @@
+{
+  "ambience_fire": {
+    "file": "ambience_fire.ogg",
+    "kind": "ambience",
+    "loop": true,
+    "positional": true,
+    "seconds": 7.5,
+    "volume": 0.55
+  },
+  "ambience_gogogo": {
+    "file": "ambience_gogogo.ogg",
+    "kind": "ambience",
+    "loop": true,
+    "seconds": 7.5,
+    "volume": 0.35
+  },
+  "ambience_wind": {
+    "file": "ambience_wind.ogg",
+    "kind": "ambience",
+    "loop": true,
+    "seconds": 11.0,
+    "volume": 0.28
+  },
+  "breath_1": {
+    "file": "breath_1.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 0.9,
+    "volume": 0.8
+  },
+  "breath_2": {
+    "file": "breath_2.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 1.1,
+    "volume": 0.8
+  },
+  "creak_1": {
+    "file": "creak_1.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 0.42,
+    "volume": 0.8
+  },
+  "creak_2": {
+    "file": "creak_2.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 0.5,
+    "volume": 0.8
+  },
+  "gallop_burst": {
+    "file": "gallop_burst.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 0.9,
+    "volume": 0.8
+  },
+  "hoof_dirt_1": {
+    "file": "hoof_dirt_1.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 0.32,
+    "volume": 0.8
+  },
+  "hoof_dirt_2": {
+    "file": "hoof_dirt_2.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 0.32,
+    "volume": 0.8
+  },
+  "hoof_dirt_3": {
+    "file": "hoof_dirt_3.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 0.32,
+    "volume": 0.8
+  },
+  "hoof_dirt_4": {
+    "file": "hoof_dirt_4.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 0.32,
+    "volume": 0.8
+  },
+  "hoof_soft_1": {
+    "file": "hoof_soft_1.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 0.28,
+    "volume": 0.8
+  },
+  "hoof_soft_2": {
+    "file": "hoof_soft_2.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 0.28,
+    "volume": 0.8
+  },
+  "hoof_soft_3": {
+    "file": "hoof_soft_3.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 0.28,
+    "volume": 0.8
+  },
+  "hoof_soft_4": {
+    "file": "hoof_soft_4.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 0.28,
+    "volume": 0.8
+  },
+  "jingle_1": {
+    "file": "jingle_1.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 0.5,
+    "volume": 0.8
+  },
+  "jingle_2": {
+    "file": "jingle_2.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 0.6,
+    "volume": 0.8
+  },
+  "jump": {
+    "file": "jump.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 0.35,
+    "volume": 0.8
+  },
+  "land": {
+    "file": "land.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 0.5,
+    "volume": 0.8
+  },
+  "nicker": {
+    "file": "nicker.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 0.9,
+    "volume": 0.8
+  },
+  "pant": {
+    "file": "pant.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 0.8,
+    "volume": 0.8
+  },
+  "skid": {
+    "file": "skid.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 0.9,
+    "volume": 0.8
+  },
+  "snort_1": {
+    "file": "snort_1.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 0.55,
+    "volume": 0.8
+  },
+  "snort_2": {
+    "file": "snort_2.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 0.45,
+    "volume": 0.8
+  },
+  "stamina_ready": {
+    "file": "stamina_ready.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 0.5,
+    "volume": 0.8
+  },
+  "stinger_start": {
+    "file": "stinger_start.ogg",
+    "kind": "music",
+    "loop": false,
+    "seconds": 6.0,
+    "volume": 0.8
+  },
+  "theme_race": {
+    "file": "theme_race.ogg",
+    "kind": "music",
+    "loop": true,
+    "seconds": 56.0,
+    "volume": 0.42
+  },
+  "theme_title": {
+    "file": "theme_title.ogg",
+    "kind": "music",
+    "loop": true,
+    "seconds": 40.0,
+    "volume": 0.55
+  },
+  "ui_click": {
+    "file": "ui_click.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 0.12,
+    "volume": 0.8
+  },
+  "ui_hover": {
+    "file": "ui_hover.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 0.08,
+    "volume": 0.8
+  },
+  "vulture": {
+    "file": "vulture.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 1.3,
+    "volume": 0.8
+  },
+  "whinny_1": {
+    "file": "whinny_1.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 1.7,
+    "volume": 0.8
+  },
+  "whinny_2": {
+    "file": "whinny_2.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 1.45,
+    "volume": 0.8
+  },
+  "whinny_3": {
+    "file": "whinny_3.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 1.2,
+    "volume": 0.8
+  },
+  "whip_crack": {
+    "file": "whip_crack.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 0.45,
+    "volume": 0.8
+  },
+  "whoosh_boost": {
+    "file": "whoosh_boost.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 0.8,
+    "volume": 0.8
+  }
+}
