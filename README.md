@@ -28,7 +28,8 @@ with a Steel Ball Run–style theme song and sound effects.
 - `src/shared/HorseModel.luau` – builds the saddled horse and rider from Parts (no upload needed) and owns the skeleton
 - `src/shared/HorseAnimator.luau` / `Gait.luau` – procedural gait: walk/trot/gallop blend, planted-hoof IK, rearing, jumping, braking
 - `src/shared/Sfx.luau` / `AudioIds.luau` – sound playback by name; `AudioIds` holds the uploaded Roblox asset IDs
-- `src/client/Mounts.client.luau` – a mount per player, riding controls, stamina, dust, hoofbeats
+- `src/client/Mounts.client.luau` – a mount per player, riding controls, stamina, dust, hoofbeats, bump reactions
+- `src/client/HoofPrints.luau` – fading hoofprints on the trail and sand
 - `src/client/Camera.client.luau`, `Hud.client.luau`, `Fx.client.luau`, `AudioDirector.client.luau` – camera feel, title screen + HUD, screen grading, music/ambience
 - `src/server/Main.server.luau` – builds the map
 - `src/client/Camera.client.luau` – fixed follow camera

@@ -16,6 +16,7 @@ local HorseAnimator = require(Shared.HorseAnimator)
 local HorseModel = require(Shared.HorseModel)
 local Sfx = require(Shared.Sfx)
 local Feel = require(script.Parent.Feel)
+local HoofPrints = require(script.Parent.HoofPrints)
 
 local player = Players.LocalPlayer
 local mountCfg = Config.Mount
@@ -122,6 +123,17 @@ local function createMount(plr: Player, character: Model)
 	rec.trailPart = anchorPart("DustTrail")
 	rec.trail = rec.trailPart
 	rec.trailEmitter = dustEmitter(rec.trailPart, true)
+	-- a slow, lingering cloud hanging in the air where a galloping rider has passed
+	rec.cloudEmitter = dustEmitter(rec.trailPart, true)
+	rec.cloudEmitter.Lifetime = NumberRange.new(1.6, 2.8)
+	rec.cloudEmitter.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 2.0), NumberSequenceKeypoint.new(1, 9.5) })
+	rec.cloudEmitter.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0.72),
+		NumberSequenceKeypoint.new(0.5, 0.86),
+		NumberSequenceKeypoint.new(1, 1),
+	})
+	rec.cloudEmitter.Speed = NumberRange.new(0.5, 3)
+	rec.cloudEmitter.Acceleration = Vector3.new(0, 1.2, 0)
 	rec.headPart = anchorPart("HeadSound")
 	rec.bodyPart = anchorPart("BodySound")
 
@@ -164,13 +176,16 @@ local function createMount(plr: Player, character: Model)
 
 	rec.anim = HorseAnimator.new(rig, {
 		seed = plr.UserId % 9973,
-		onStep = function(leg: string, strength: number)
+		onStep = function(leg: string, strength: number, hoofPos: Vector3)
 			local d = rec.dust[leg]
 			local falloff = near()
 			if falloff <= 0.05 then
 				return
 			end
 			d.emitter:Emit(math.floor(1 + strength * 4))
+			if falloff > 0.2 and rec.anim.speed > 3 then
+				HoofPrints.stamp(hoofPos, rec.yaw, leg:sub(1, 1) == "F")
+			end
 			local walking = rec.anim.gait == "walk"
 			Sfx.variant(walking and "hoof_soft" or "hoof_dirt", 4, {
 				parent = d.part,
@@ -216,6 +231,40 @@ local function createMount(plr: Player, character: Model)
 				end
 			end
 		end)
+	end
+	-- Bumping into another rider: the server gives every character an invisible "MountBody" block, so
+	-- horses collide for real; here we just react to a hard hit with sound, a flinch and a camera jolt.
+	if isLocal then
+		local body = character:WaitForChild("MountBody", 5)
+		if body then
+			local lastBump = 0
+			body.Touched:Connect(function(other)
+				if other.Name ~= "MountBody" or other.Parent == character then
+					return
+				end
+				local now = os.clock()
+				if now - lastBump < 0.7 or not Feel.started then
+					return
+				end
+				local otherRoot = other.Parent and other.Parent:FindFirstChild("HumanoidRootPart")
+				local otherVel = otherRoot and otherRoot.AssemblyLinearVelocity or Vector3.zero
+				local rel = (rec.vel - otherVel).Magnitude
+				if rel < 7 then
+					return -- just brushing past
+				end
+				lastBump = now
+				local strength = sat(rel / 40)
+				Sfx.play("bump", { parent = rec.bodyPart, volume = 0.5 + 0.6 * strength, jitter = 0.08 })
+				if math.random() < 0.5 then
+					Sfx.variant("whinny", 3, { parent = rec.headPart, volume = 0.55, delay = 0.12, jitter = 0.06 })
+				end
+				rec.anim:toss("snort")
+				for _, d in rec.dust do
+					d.emitter:Emit(3 + math.floor(strength * 5))
+				end
+				Feel.impulse(0.15 + 0.5 * strength, 2.5 * strength)
+			end)
+		end
 	end
 	mounts[plr] = rec
 end
@@ -266,6 +315,11 @@ local function control(rec, dt: number)
 			Sfx.play("whip_crack", { volume = 0.9, jitter = 0.05 })
 			Sfx.play("whoosh_boost", { volume = 0.6 })
 			Sfx.play("gallop_burst", { parent = rec.bodyPart, volume = 0.8 })
+			-- kick up a puff as the horse digs in
+			rec.trailEmitter:Emit(20)
+			for _, d in rec.dust do
+				d.emitter:Emit(7)
+			end
 			if math.random() < 0.6 then
 				Sfx.variant("whinny", 3, { parent = rec.headPart, volume = 0.9, delay = 0.15 })
 			end
@@ -405,6 +459,7 @@ local function updateMount(rec, dt: number)
 	local back = rootCF * Vector3.new(0, 1.2, 4.6)
 	rec.trailPart.Position = Vector3.new(back.X, groundY + 0.4, back.Z)
 	rec.trailEmitter.Rate = speed > 15 and (4 + 26 * sat((speed - 15) / 22)) or 0
+	rec.cloudEmitter.Rate = speed > 24 and (2 + 10 * sat((speed - 24) / 12)) or 0
 	local lift = sat((height - rec.baseHeight) / 7)
 	rec.shadow.CFrame = CFrame.new(pos.X, groundY + 0.12, pos.Z) * CFrame.Angles(0, rec.yaw, math.pi / 2)
 	rec.shadow.Transparency = 0.58 + 0.38 * lift

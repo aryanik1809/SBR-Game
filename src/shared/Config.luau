@@ -24,6 +24,12 @@ return {
 		JumpHeight = 7,
 		-- Multiplies the horse and rider colours (1 = as designed). Nudge if they look washed out or dark in Studio.
 		ColorScale = 0.9,
+		-- Invisible body that makes riders bump into each other (and props) like horses, not like thin avatars.
+		Collision = {
+			Enabled = true,
+			Size = Vector3.new(3.2, 4, 6.5),
+			Offset = Vector3.new(0, -0.4, 0),
+		},
 		Stamina = {
 			Max = 100,
 			Drain = 24, -- per second while galloping
@@ -43,6 +49,11 @@ return {
 		TitleDistance = 34,
 		TitleFov = 42,
 		IntroSeconds = 2.4,
+	},
+	Prints = {
+		Enabled = true,
+		Max = 90, -- hoofprints alive at once (recycled)
+		Life = 9, -- seconds a print on the trail lasts (sand fades faster)
 	},
 	Fx = {
 		-- Screen colour grading + bloom (client only, does not touch the world). Set false to disable.

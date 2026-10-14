@@ -226,12 +226,38 @@ local function hideAvatar(character: Model)
 	character.DescendantAdded:Connect(hide)
 end
 
+-- An invisible, massless block welded to the root part so riders are horse-sized in the physics world:
+-- they bump into each other and into props instead of overlapping like thin avatars.
+local function addMountBody(character: Model)
+	local cfg = Config.Mount.Collision
+	if not cfg.Enabled then
+		return
+	end
+	local root = character:WaitForChild("HumanoidRootPart") :: BasePart
+	local body = Instance.new("Part")
+	body.Name = "MountBody"
+	body.Size = cfg.Size
+	body.Transparency = 1
+	body.CanCollide = true
+	body.CanTouch = true
+	body.CanQuery = false
+	body.CastShadow = false
+	body.Massless = true
+	body.CFrame = root.CFrame * CFrame.new(cfg.Offset)
+	body.Parent = character
+	local weld = Instance.new("WeldConstraint")
+	weld.Part0 = root
+	weld.Part1 = body
+	weld.Parent = body
+end
+
 local function onCharacter(character: Model)
 	local humanoid = character:WaitForChild("Humanoid") :: Humanoid
 	humanoid.WalkSpeed = Config.Player.WalkSpeed
 	humanoid.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
 	humanoid.HealthDisplayType = Enum.HumanoidHealthDisplayType.AlwaysOff
 	hideAvatar(character)
+	addMountBody(character)
 end
 Players.PlayerAdded:Connect(function(player)
 	player.CharacterAdded:Connect(onCharacter)

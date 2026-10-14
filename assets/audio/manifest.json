@@ -35,6 +35,13 @@
     "seconds": 1.1,
     "volume": 0.8
   },
+  "bump": {
+    "file": "bump.ogg",
+    "kind": "sfx",
+    "loop": false,
+    "seconds": 0.8,
+    "volume": 0.8
+  },
   "creak_1": {
     "file": "creak_1.ogg",
     "kind": "sfx",

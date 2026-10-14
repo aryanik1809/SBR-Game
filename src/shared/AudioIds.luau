@@ -7,6 +7,7 @@ return {
 	ambience_wind = { id = 0, volume = 0.28, loop = true, kind = "ambience", seconds = 11.0 },
 	breath_1 = { id = 0, volume = 0.8, loop = false, kind = "sfx", seconds = 0.9 },
 	breath_2 = { id = 0, volume = 0.8, loop = false, kind = "sfx", seconds = 1.1 },
+	bump = { id = 0, volume = 0.8, loop = false, kind = "sfx", seconds = 0.8 },
 	creak_1 = { id = 0, volume = 0.8, loop = false, kind = "sfx", seconds = 0.42 },
 	creak_2 = { id = 0, volume = 0.8, loop = false, kind = "sfx", seconds = 0.5 },
 	gallop_burst = { id = 0, volume = 0.8, loop = false, kind = "sfx", seconds = 0.9 },

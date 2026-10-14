@@ -847,6 +847,20 @@ def vulture():
     return band(sig + 0.2 * noise(n), 900, 4500, 1) * np.interp(t, [0, 0.05, 0.5, 1.3], [0, 1, 0.7, 0]) * 0.25
 
 
+def bump(dur=0.8):
+    """Two riders colliding: body thud, leather slap, tack rattle and a startled grunt."""
+    n = ns(dur)
+    t = tt(n)
+    thud = np.sin(PI2 * np.cumsum(88 * (1 + 0.8 * np.exp(-t / 0.04))) / SR) * np.exp(-t / 0.13)
+    slap = band(noise(n), 400, 3200, 2) * np.exp(-t / 0.05)
+    out = thud * 1.0 + slap * 0.8
+    j = jingle(21, 0.5, 7)
+    out[ns(0.02) : ns(0.02) + len(j)] += j[: n - ns(0.02)] * 1.2
+    g = nicker(12, 0.45)
+    out[ns(0.06) : ns(0.06) + len(g)] += g[: n - ns(0.06)] * 1.5
+    return out
+
+
 def stamina_ready():
     n = ns(0.5)
     t = tt(n)
@@ -879,6 +893,7 @@ def build_sfx():
     s["whoosh_boost"] = whoosh(0.8, True, 0.9)
     s["pant"] = pant()
     s["stamina_ready"] = stamina_ready()
+    s["bump"] = bump()
     s["ui_click"] = ui_click()
     s["ui_hover"] = ui_hover()
     s["vulture"] = vulture()
@@ -901,6 +916,7 @@ META = {
 
 def main():
     which = sys.argv[1] if len(sys.argv) > 1 else "all"
+    only = set(sys.argv[2:])  # e.g. `make_audio.py sfx bump` renders just that sound
     os.makedirs(OUT, exist_ok=True)
     manifest = {}
     if which in ("all", "music"):
@@ -910,6 +926,8 @@ def main():
             print(f"music {name}: {len(x) / SR:.1f}s peak {np.max(np.abs(x)):.2f} rms {np.sqrt(np.mean(x ** 2)):.3f}")
     if which in ("all", "sfx"):
         for name, x in build_sfx().items():
+            if only and name not in only:
+                continue
             x = np.nan_to_num(x)
             peak = 0.8 if not name.startswith("ambience") else 0.7
             x = normalise(x, peak)

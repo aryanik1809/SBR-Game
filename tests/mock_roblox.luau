@@ -280,6 +280,12 @@ local Color3 = {
 	end,
 }
 
+local Vector2 = {
+	new = function(x, y)
+		return { X = x or 0, Y = y or 0 }
+	end,
+}
+
 -- tests/run.py injects these as locals ahead of every module it loads.
 return {
 	Vector3 = V3,
@@ -289,4 +295,5 @@ return {
 	Instance = Instance,
 	workspace = workspace,
 	Random = Random,
+	Vector2 = Vector2,
 }

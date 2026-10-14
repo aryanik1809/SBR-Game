@@ -19,7 +19,7 @@ LUAU = os.environ.get("LUAU") or shutil.which("luau")
 if not LUAU:
     sys.exit("luau CLI not found (set $LUAU)")
 
-NAMES = ["Vector3", "CFrame", "Color3", "Enum", "Instance", "workspace", "Random"]
+NAMES = ["Vector3", "CFrame", "Color3", "Enum", "Instance", "workspace", "Random", "Vector2"]
 
 
 def main():
