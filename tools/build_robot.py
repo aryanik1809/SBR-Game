@@ -20,19 +20,12 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np  # noqa: E402
 
-import build_horse as bh  # noqa: E402  (imports bpy)
-from build_horse import Part, X, Y, Z, add_block, add_loft, col, fbm, mix, ring, smooth  # noqa: E402
-from mathutils import Matrix, Vector  # noqa: E402
+import blocky  # noqa: E402
+from blocky import INK, V, aa, add_block, add_loft, col, ellipse_mask, layers, mix, ring, smooth, sphere, tube_pts  # noqa: E402
+from build_horse import Part, X, Y, Z  # noqa: E402
+from mathutils import Matrix  # noqa: E402
 
-OUT = os.path.join(bh.ROOT, "assets", "robot")
-bh.OUT = OUT
-bh.NAME = "robot"
-bh.RIG_NAME = "RobotRig"
-bh.MAT_NAME = "RobotMat"
-bh.ATLAS = 1024
-bh.PAD = 3
-
-V = Vector
+OUT = os.path.join(blocky.bh.ROOT, "assets", "robot")
 TAU = math.tau
 
 # ----------------------------------------------------------------------------
@@ -61,44 +54,11 @@ for sx, side in ((1, "Right"), (-1, "Left")):
     BONES[f"{side}UpperLeg"] = ((sx * 0.08, 0, M(0.635)), (sx * 0.125, 0, M(0.42)), "LowerTorso")
     BONES[f"{side}LowerLeg"] = ((sx * 0.125, 0, M(0.42)), (sx * 0.17, 0, M(0.25)), f"{side}UpperLeg")
     BONES[f"{side}Foot"] = ((sx * 0.17, 0, M(0.25)), (sx * 0.17, 0.2, 0.05), f"{side}LowerLeg")
-bh.BONES = BONES
 
 
 # ----------------------------------------------------------------------------
-# Geometry helpers (all low-poly)
+# Geometry helpers (shared ones live in tools/blocky.py)
 # ----------------------------------------------------------------------------
-def tube_pts(part, pts, hw, hd, mat, ch=0.3, cap_mats=("CULL", "CULL")):
-    """Chamfered loft along a polyline; hw/hd are half sizes along X / the other horizontal axis."""
-    P = [V(p) for p in pts]
-    secs = []
-    for j in range(len(P)):
-        t = (P[min(j + 1, len(P) - 1)] - P[max(j - 1, 0)]).normalized()
-        u = t.cross(Z)
-        if u.length < 1e-4:
-            u = X.copy()
-        u.normalize()
-        v = u.cross(t).normalized()
-        secs.append(ring(P[j], u, v, hw[j], hd[j], ch))
-    add_loft(part, secs, mat, cap_mats=cap_mats)
-
-
-def layers(part, rows, mat, ch=0.3, cap_mats=("CULL", "CULL")):
-    """Stack of horizontal rings: rows of (z, half_width_x, half_depth_y, centre_y)."""
-    secs = [ring(V((0, r[3] if len(r) > 3 else 0, r[0])), X, Y, r[1], r[2], ch) for r in rows]
-    add_loft(part, secs, mat, cap_mats=cap_mats)
-
-
-def sphere(part, c, r, mat, seg=8, lats=(-58, -18, 18, 58)):
-    """Faceted ball: stacked rings capped with flat polygons."""
-    c = V(c)
-    secs = []
-    for lat in lats:
-        a = math.radians(lat)
-        rr, zz = r * math.cos(a), r * math.sin(a)
-        secs.append([c + V((rr * math.cos(TAU * i / seg), rr * math.sin(TAU * i / seg), zz)) for i in range(seg)])
-    add_loft(part, secs, mat)
-
-
 def wire(part, pts, r, mat="green", n=6):
     """Thin 6-sided tube along a bent polyline."""
     P = [V(p) for p in pts]
@@ -208,70 +168,16 @@ TONES = {
     "green": [col(.38, .84, .38), col(.16, .67, .25), col(.07, .42, .30), col(.04, .25, .24)],
     "gray": [col(.84, .84, .88), col(.56, .57, .62), col(.33, .34, .47), col(.20, .20, .34)],
 }
-LIGHT = np.array([0.50, 0.42, 0.76])
-LIGHT = LIGHT / np.linalg.norm(LIGHT)  # from the upper left of the viewer, in front
-PART_BB = {}
+TONES = {
+    "tan": [col(.97, .76, .42), col(.89, .61, .27), col(.74, .43, .24), col(.52, .29, .25)],
+    "purple": [col(.68, .38, .74), col(.50, .22, .60), col(.29, .13, .47), col(.18, .08, .34)],
+    "green": [col(.38, .84, .38), col(.16, .67, .25), col(.07, .42, .30), col(.04, .25, .24)],
+    "gray": [col(.84, .84, .88), col(.56, .57, .62), col(.33, .34, .47), col(.20, .20, .34)],
+}
 
 
-def tone_index(lum):
-    return 0 if lum > 0.62 else (1 if lum > -0.10 else (2 if lum > -0.50 else 3))
-
-
-def toon(c, key, metal=0.0, rough=0.7, overlay=None):
-    """Flat cel colour for the face + hard-edged cast shadow near the part bottom + ink hatching + outline."""
-    x, y, z = c.x, c.y, c.z
-    s = c.seed
-    N = c.N
-    lum = float(N.x * LIGHT[0] + N.y * LIGHT[1] + N.z * LIGHT[2])
-    idx = tone_index(lum)
-    tones = TONES[key]
-    n1 = fbm(x * 9, y * 9, z * 9, s, 3)
-    n2 = fbm(x * 70, y * 70, z * 70, s + 1, 2)
-    # hard-edged shadow shape: the lower part of every body part falls into the next tone
-    lo, hi = PART_BB.get(c.part, (0.0, 1.5))
-    t = (z - lo) / max(hi - lo, 1e-3)
-    wobble = (fbm(x * 5, y * 5, z * 5, s + 3, 2) - 0.5) * 0.14
-    low_band = (t + wobble) < 0.13
-    base = np.where(low_band[..., None], tones[min(idx + 1, 3)], tones[idx]).astype(np.float32)
-    deep = np.logical_or(low_band, idx >= 2)
-    # manga hatching: diagonal ink lines on shadow, a second crossing set on the deepest tone
-    h1 = ((c.pu * 0.8 + c.pv * 0.6) / 0.021)
-    line1 = (np.abs(h1 - np.floor(h1) - 0.5) < 0.17)
-    h2 = ((c.pu * 0.8 - c.pv * 0.6) / 0.021)
-    line2 = (np.abs(h2 - np.floor(h2) - 0.5) < 0.15)
-    hatch = np.zeros_like(x)
-    hatch = np.where(deep & (idx >= 2), line1 * 0.30, hatch)
-    hatch = np.where(((idx >= 3) | (low_band & (idx >= 2))), np.maximum(hatch, line2 * 0.30), hatch)
-    colr = mix(base, INK * 1.2, hatch)
-    # rim light: a thin lighter stroke just inside the edge of lit faces
-    w = min(0.0068, 0.2 * c.mind)
-    if idx <= 1 and w > 1e-4:
-        rim = smooth(w * 2.7, w * 1.8, c.ed) * smooth(w * 1.2, w * 1.9, c.ed)
-        colr = colr * (1 + 0.16 * rim)[..., None]
-    # paper grit + speckles
-    colr = colr * (0.965 + 0.07 * n2)[..., None]
-    sp = fbm(c.pu * 90, c.pv * 90, np.full_like(x, s * 0.1), s + 4, 1)
-    colr = mix(colr, INK * 1.6, smooth(0.9, 0.97, sp) * 0.5)
-    height = 0.5 + 0.12 * n2 - 0.25 * hatch
-    rough_a = np.full_like(x, rough)
-    metal_a = np.full_like(x, metal)
-    if overlay is not None:
-        colr, height, rough_a, metal_a = overlay(c, colr, height, rough_a, metal_a, lum)
-    # thick ink outline on every facet edge, softened toward the inside
-    if w > 1e-4:
-        ln = smooth(w, w * 0.35, c.ed)
-        colr = mix(colr, INK, 0.92 * ln)
-        height = height - 0.6 * ln
-    return np.clip(colr, 0, 1), height, rough_a, metal_a
-
-
-def ellipse_mask(x, z, cx, cz, rx, rz):
-    return np.hypot((x - cx) / rx, (z - cz) / rz)
-
-
-def aa(dist, ppm, width=1.4):
-    """Anti-aliased coverage from a signed distance in metres (positive = inside), ~`width` texels wide."""
-    return np.clip(0.5 + dist * ppm / width, 0.0, 1.0)
+def toon(c, key, **kw):
+    return blocky.toon(c, TONES[key], INK, **kw)
 
 
 def overlay_head(c, colr, height, rough, metal, lum):
@@ -353,34 +259,10 @@ def make_painters():
     return {"tan": tan, "purple": purple, "green": green, "gray": gray}
 
 
-bh.PAINTERS.clear()
-bh.PAINTERS.update(make_painters())
-bh.MAT_KEYS[:] = list(bh.PAINTERS) + ["CULL"]
-bh.DENSITY.clear()
-bh.DENSITY.update({"green": 0.6})
-bh.PART_DENSITY.clear()
-bh.PART_DENSITY.update({"Head": 1.6, "UpperTorso": 1.1})
-
-
 def main():
-    os.makedirs(OUT, exist_ok=True)
-    bh.PARTS = build_parts()
-    prepared = bh.prepare_faces(bh.PARTS)
-    for name, (verts, faces) in prepared.items():
-        zs = [v.z for v in verts]
-        PART_BB[name] = (min(zs), max(zs))
-    recs, ppm = bh.build_atlas(prepared)
-    color, nrm, rough, metal = bh.bake_textures(recs, ppm)
-    imgs = {k: os.path.join(OUT, f"robot_{k}.png") for k in ("color", "normal")}
-    imgs["rough"] = os.path.join(OUT, "robot_roughness.png")
-    imgs["metal"] = os.path.join(OUT, "robot_metalness.png")
-    bh.save_png(color, imgs["color"])
-    bh.save_png(nrm, imgs["normal"])
-    bh.save_png(rough, imgs["rough"], gray=True)
-    bh.save_png(metal, imgs["metal"], gray=True)
-    arm, objs, mat = bh.build_scene(prepared, recs, ppm, imgs)
-    bh.export_all(arm, objs)
-    print("parts:", len(objs), "done ->", OUT)
+    blocky.setup("robot", "RobotRig", "RobotMat", OUT, 1024, BONES, make_painters(),
+                 density={"green": 0.6}, part_density={"Head": 1.6, "UpperTorso": 1.1})
+    blocky.build(build_parts(), OUT, "robot")
 
 
 if __name__ == "__main__":
