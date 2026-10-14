@@ -33,6 +33,10 @@ from PIL import Image
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "assets", "horse")
+# Other models (tools/build_dino.py) reuse this module by overriding these before building.
+NAME = "horse"  # file prefix for the exports
+RIG_NAME = "HorseRig"
+MAT_NAME = "HorseMat"
 ATLAS = 2048
 PAD = 4
 
@@ -760,6 +764,7 @@ def face_frame(pts, N):
 
 # texel-density multipliers: plain dark hair and undersides need fewer pixels
 DENSITY = {"mane": 0.55, "hoof": 0.9}
+PART_DENSITY = {}  # optional per-part multiplier (set by other models)
 
 
 def build_atlas(prepared):
@@ -778,7 +783,7 @@ def build_atlas(prepared):
     ppm = 700.0
     while True:
         for r in recs:
-            r["ppm"] = ppm * DENSITY.get(r["mat"], 1.0) * (0.4 if r["N"].z < -0.6 else 1.0)
+            r["ppm"] = ppm * DENSITY.get(r["mat"], 1.0) * PART_DENSITY.get(r["part"], 1.0) * (0.4 if r["N"].z < -0.6 else 1.0)
             r["w"] = max(3, int(math.ceil((r["umax"] - r["umin"]) * r["ppm"]))) + 2 * PAD
             r["h"] = max(3, int(math.ceil((r["vmax"] - r["vmin"]) * r["ppm"]))) + 2 * PAD
         order = sorted(recs, key=lambda r: -r["h"])
@@ -820,6 +825,8 @@ def bake_textures(recs, ppm):
         c.x, c.y, c.z = Pw[..., 0], Pw[..., 1], Pw[..., 2]
         c.N = r["N"]
         c.seed = (k * 7919) % 100003
+        c.part = r["part"]  # painters can special-case a body part
+        c.ppm = r["ppm"]  # texels per metre of this face, for anti-aliased painted edges
         c.ed = polygon_edge_dist(r["loc"], pu, pv)
         c.mind = min(r["umax"] - r["umin"], r["vmax"] - r["vmin"])
         cc, hh, rr, mm = PAINTERS[r["mat"]](c)
@@ -864,7 +871,7 @@ BONES = {
 
 
 def make_material(imgs):
-    mat = bpy.data.materials.new("HorseMat")
+    mat = bpy.data.materials.new(MAT_NAME)
     mat.use_nodes = True
     nt = mat.node_tree
     nt.nodes.clear()
@@ -903,8 +910,8 @@ def build_scene(prepared, recs, ppm, imgs):
         by_part.setdefault(r["part"], {})[r["fi"]] = r
 
     # armature
-    arm_data = bpy.data.armatures.new("HorseRig")
-    arm = bpy.data.objects.new("HorseRig", arm_data)
+    arm_data = bpy.data.armatures.new(RIG_NAME)
+    arm = bpy.data.objects.new(RIG_NAME, arm_data)
     scene.collection.objects.link(arm)
     bpy.context.view_layer.objects.active = arm
     bpy.ops.object.mode_set(mode="EDIT")
@@ -947,7 +954,7 @@ def build_scene(prepared, recs, ppm, imgs):
 
 def export_all(arm, objs):
     os.makedirs(OUT, exist_ok=True)
-    bpy.ops.wm.save_as_mainfile(filepath=os.path.join(OUT, "horse.blend"), compress=True)
+    bpy.ops.wm.save_as_mainfile(filepath=os.path.join(OUT, f"{NAME}.blend"), compress=True)
 
     def select(sel):
         bpy.ops.object.select_all(action="DESELECT")
@@ -957,13 +964,13 @@ def export_all(arm, objs):
 
     # rigged FBX
     select([arm] + objs)
-    bpy.ops.export_scene.fbx(filepath=os.path.join(OUT, "horse_rigged.fbx"), use_selection=True,
+    bpy.ops.export_scene.fbx(filepath=os.path.join(OUT, f"{NAME}_rigged.fbx"), use_selection=True,
                              object_types={"ARMATURE", "MESH"}, add_leaf_bones=False,
                              axis_forward="-Z", axis_up="Y", mesh_smooth_type="FACE",
                              bake_anim=False, path_mode="AUTO")
     # glb
     select([arm] + objs)
-    bpy.ops.export_scene.gltf(filepath=os.path.join(OUT, "horse.glb"), export_format="GLB", use_selection=True,
+    bpy.ops.export_scene.gltf(filepath=os.path.join(OUT, f"{NAME}.glb"), export_format="GLB", use_selection=True,
                               export_yup=True)
     # static OBJ: join copies of every part
     copies = []
@@ -977,8 +984,8 @@ def export_all(arm, objs):
     select(copies)
     bpy.ops.object.join()
     joined = bpy.context.view_layer.objects.active
-    joined.name = "HorseStatic"
-    bpy.ops.wm.obj_export(filepath=os.path.join(OUT, "horse_static.obj"), export_selected_objects=True,
+    joined.name = NAME.title() + "Static"
+    bpy.ops.wm.obj_export(filepath=os.path.join(OUT, f"{NAME}_static.obj"), export_selected_objects=True,
                           forward_axis="NEGATIVE_Z", up_axis="Y", export_materials=True,
                           path_mode="RELATIVE")
     print("tris (static):", sum(len(p.vertices) - 2 for p in joined.data.polygons))
