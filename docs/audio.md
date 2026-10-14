@@ -14,6 +14,7 @@ octave-down brass).
 | --- | --- | --- |
 | `theme_title` | 40 s, loops | Title screen: drum-roll intro, fanfare hit, riff, then the main melody |
 | `theme_race` | 56 s, loops | Gameplay: riff, melody, breakdown, big finale |
+| `theme_dust` | 58 s, loops | Second original theme (D minor, 132 BPM): intro, verse with solo guitar, chorus, choir bridge, final chorus. Not wired in; switch it on with `Sfx.setMusic("theme_dust")` in `AudioDirector.client.luau`. Built by `tools/make_theme_dust.py` |
 | `stinger_start` | 6 s | The "pose" hit when you press start |
 
 ## Sound effects

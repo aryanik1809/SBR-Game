@@ -30,6 +30,7 @@ return {
 	snort_2 = { id = 0, volume = 0.8, loop = false, kind = "sfx", seconds = 0.45 },
 	stamina_ready = { id = 0, volume = 0.8, loop = false, kind = "sfx", seconds = 0.5 },
 	stinger_start = { id = 0, volume = 0.8, loop = false, kind = "music", seconds = 6.0 },
+	theme_dust = { id = 0, volume = 0.45, loop = true, kind = "music", seconds = 58.18 },
 	theme_race = { id = 0, volume = 0.42, loop = true, kind = "music", seconds = 56.0 },
 	theme_title = { id = 0, volume = 0.55, loop = true, kind = "music", seconds = 40.0 },
 	ui_click = { id = 0, volume = 0.8, loop = false, kind = "sfx", seconds = 0.12 },

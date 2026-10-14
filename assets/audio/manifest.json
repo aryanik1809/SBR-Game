@@ -196,6 +196,13 @@
     "seconds": 6.0,
     "volume": 0.8
   },
+  "theme_dust": {
+    "file": "theme_dust.ogg",
+    "kind": "music",
+    "loop": true,
+    "seconds": 58.18,
+    "volume": 0.45
+  },
   "theme_race": {
     "file": "theme_race.ogg",
     "kind": "music",

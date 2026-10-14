@@ -3,7 +3,7 @@
 
     python3 tools/render_stand.py [out_dir] [--views a,b,c] [--samples N]
 
-Views: side, three_q, front, back, top, head, hand, foot, tail.
+Views: face, face_3q, face_side, side, three_q, front, back, top, head, hand, foot, tail.
 """
 import argparse
 import math
@@ -28,6 +28,9 @@ VIEWS = {
     "arm": ((-0.5, 0.9, 0.85), (0.33, 0.0, 0.76), 55),
     "knee": ((-0.5, 0.9, 0.55), (0.11, 0.05, 0.42), 55),
     "foot": ((0.8, 0.9, 0.3), (0.11, 0.05, 0.1), 55),
+    "face": ((0, 1.0, 1.50), (0, 0.1, 1.50), 85),
+    "face_3q": ((-0.55, 0.85, 1.58), (0, 0.1, 1.48), 85),
+    "face_side": ((0.95, 0.25, 1.50), (0, 0.05, 1.50), 85),
 }
 
 
@@ -55,6 +58,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("out", nargs="?", default=os.path.join(ROOT, "assets", "stand", "previews"))
     ap.add_argument("--pose", default="stand")
+    ap.add_argument("--rig", default="StandRig")
     ap.add_argument("--views", default="front,three_q,side,back,three_q_back,head,shoulder,belt,arm,knee,foot")
     ap.add_argument("--samples", type=int, default=48)
     ap.add_argument("--res", type=int, default=900)
@@ -63,7 +67,7 @@ def main():
 
     bpy.ops.wm.open_mainfile(filepath=args.blend)
     scene = bpy.context.scene
-    arm = bpy.data.objects["StandRig"]
+    arm = bpy.data.objects[args.rig]
 
     if args.pose != "stand":
         apply_pose(arm, args.pose)

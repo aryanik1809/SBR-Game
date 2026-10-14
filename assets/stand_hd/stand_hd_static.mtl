@@ -1,0 +1,14 @@
+# Blender 5.2.2 LTS MTL File: 'stand_hd.blend'
+# www.blender.org
+
+newmtl StandHDMat
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd stand_hd_color.png
+map_Ns stand_hd_roughness.png
+map_refl stand_hd_metalness.png
+map_Bump -bm 0.800000 stand_hd_normal.png
