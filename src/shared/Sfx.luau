@@ -1,8 +1,14 @@
--- Sound playback for the whole game. Every sound is looked up by name in AudioIds; if a sound has no
--- Roblox asset id yet (id = 0) every call here quietly does nothing, so the game runs fine before the
--- audio has been uploaded (see tools/upload_audio.py).
+-- Sound playback for the whole game. Every sound is looked up by name; if it can't be found every call
+-- here quietly does nothing, so the game runs fine before the audio has been uploaded.
+--
+-- A sound's Roblox asset id comes from, in order:
+--   1. AudioIds.luau (filled in by tools/upload_audio.py, or by hand), or
+--   2. a Sound object in a folder called "SBRAudio" in ReplicatedStorage. In Studio you can bulk-import
+--      assets/audio/*.ogg, select them in Asset Manager and drag them into that folder; Studio makes a
+--      Sound named after each file, and that is all this needs (no copying ids around).
 local ContentProvider = game:GetService("ContentProvider")
 local Debris = game:GetService("Debris")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
 
@@ -19,6 +25,64 @@ local currentMusicName: string? = nil
 local initialised = false
 
 local KIND_GROUP = { music = "Music", sfx = "Sfx", ambience = "Ambience" }
+
+-- ---- finding sound ids -----------------------------------------------------------------------------------
+local FOLDER_NAME = "SBRAudio"
+local library: { [string]: string } = {} -- normalised name -> SoundId, from the Studio folder
+local watching = false
+
+-- "SBR hoof_dirt_1.ogg" / "Hoof Dirt 1" -> "hoof_dirt_1"
+local function normalise(name: string): string
+	local n = name:lower()
+	n = n:gsub("%.%w+$", "")
+	n = n:gsub("^sbr[%s_%-]+", "")
+	n = n:gsub("[%s%-]+", "_")
+	return n
+end
+
+local function indexSound(inst: Instance)
+	if inst:IsA("Sound") and inst.SoundId ~= "" then
+		library[normalise(inst.Name)] = inst.SoundId
+	end
+end
+
+local function scanFolder(folder: Instance)
+	for _, d in folder:GetDescendants() do
+		indexSound(d)
+	end
+	if not watching then
+		watching = true
+		folder.DescendantAdded:Connect(function(d)
+			task.defer(indexSound, d)
+		end)
+	end
+end
+
+local function findFolder(): Instance?
+	return ReplicatedStorage:FindFirstChild(FOLDER_NAME) or SoundService:FindFirstChild(FOLDER_NAME)
+end
+
+do
+	local folder = findFolder()
+	if folder then
+		scanFolder(folder)
+	else
+		ReplicatedStorage.ChildAdded:Connect(function(child)
+			if child.Name == FOLDER_NAME and not watching then
+				scanFolder(child)
+			end
+		end)
+	end
+end
+
+-- The rbxassetid:// string for a sound, or nil if it hasn't been set up yet.
+local function soundIdFor(name: string): string?
+	local def = AudioIds[name]
+	if def and def.id ~= 0 then
+		return "rbxassetid://" .. def.id
+	end
+	return library[name]
+end
 
 function Sfx.init()
 	if initialised then
@@ -38,10 +102,11 @@ function Sfx.init()
 	-- Warm the cache so the first hoofbeat doesn't stutter.
 	task.spawn(function()
 		local list = {}
-		for _, def in AudioIds do
-			if def.id ~= 0 then
+		for name in AudioIds do
+			local id = soundIdFor(name)
+			if id then
 				local s = Instance.new("Sound")
-				s.SoundId = "rbxassetid://" .. def.id
+				s.SoundId = id
 				table.insert(list, s)
 			end
 		end
@@ -57,20 +122,31 @@ function Sfx.init()
 end
 
 function Sfx.has(name: string): boolean
-	local def = AudioIds[name]
-	return def ~= nil and def.id ~= 0
+	return AudioIds[name] ~= nil and soundIdFor(name) ~= nil
 end
 
--- (sounds with an id, total sounds)
+-- (sounds that can play, total sounds)
 function Sfx.status(): (number, number)
 	local have, total = 0, 0
-	for _, def in AudioIds do
+	for name in AudioIds do
 		total += 1
-		if def.id ~= 0 then
+		if soundIdFor(name) then
 			have += 1
 		end
 	end
 	return have, total
+end
+
+-- Names of sounds that still have no id (for the start-up report).
+function Sfx.missing(): { string }
+	local out = {}
+	for name in AudioIds do
+		if not soundIdFor(name) then
+			table.insert(out, name)
+		end
+	end
+	table.sort(out)
+	return out
 end
 
 function Sfx.setGroupVolume(kind: string, volume: number, fade: number?)
@@ -87,13 +163,14 @@ end
 
 local function make(name: string, opts): Sound?
 	local def = AudioIds[name]
-	if not def or def.id == 0 then
+	local id = def and soundIdFor(name)
+	if not def or not id then
 		return nil
 	end
 	Sfx.init()
 	local s = Instance.new("Sound")
 	s.Name = name
-	s.SoundId = "rbxassetid://" .. def.id
+	s.SoundId = id
 	s.Volume = def.volume * (opts.volume or 1)
 	local jitter = opts.jitter or 0
 	s.PlaybackSpeed = (opts.pitch or 1) * (1 + (jitter > 0 and rng:NextNumber(-jitter, jitter) or 0))
@@ -183,7 +260,7 @@ function Sfx.setMusic(name: string?, fade: number?, volumeScale: number?)
 		return
 	end
 	local def = AudioIds[name]
-	if not def or def.id == 0 then
+	if not def or not soundIdFor(name) then
 		return
 	end
 	local s = make(name, { volume = 0, loop = true })

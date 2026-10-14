@@ -26,10 +26,19 @@ stamina-ready chime, UI click/hover, a distant vulture, and looping ambiences: o
 ## Getting it to play in Roblox
 
 Roblox can only play audio that has been uploaded to it, so the `.ogg` files are not used directly.
-Until they're uploaded every sound in `src/shared/AudioIds.luau` has `id = 0` and the game is just silent
+Until they're set up every sound in `src/shared/AudioIds.luau` has `id = 0` and the game is just silent
 (it prints how many sounds are missing on start).
 
-**Option A, script it** (needs an ID-verified account and an Open Cloud API key with `asset:read` and
+**Easiest: drag them in (no IDs to copy).**
+1. In Studio, **View > Asset Manager > Audio > Bulk Import** and pick every file in `assets/audio/` (everything except `manifest.json`).
+2. In the Explorer, add a **Folder** named exactly `SBRAudio` inside **ReplicatedStorage**.
+3. Select all the imported audio in Asset Manager and drag them into that folder. Studio creates a Sound named after each file.
+4. Press Play. The Output window prints `[SBR audio] all 37 sounds ready`, or lists the names it couldn't find.
+
+The game reads each Sound's `SoundId`, so nothing else needs editing. Rojo leaves the folder alone.
+`AudioIds.luau` still wins if an ID is set there.
+
+**Option B, script it** (needs an ID-verified account and an Open Cloud API key with `asset:read` and
 `asset:write`, from create.roblox.com > Credentials):
 
 ```
@@ -41,7 +50,7 @@ It writes the returned asset IDs into `src/shared/AudioIds.luau`, saving after e
 interrupted run keeps its progress. Commit that file. Audio goes through moderation, so a freshly
 uploaded sound may stay silent for a few minutes.
 
-**Option B, by hand**: Studio > Asset Manager > Bulk Import, import the files in `assets/audio/`, then
+**Option C, by hand**: Studio > Asset Manager > Bulk Import, import the files in `assets/audio/`, then
 paste each ID into `AudioIds.luau` (`name = { id = 123456, ... }`).
 
 The uploader was written against the documented Open Cloud Assets API but has not been run against a

@@ -419,7 +419,7 @@ stroke(prompt, 4)
 local noAudio = Sfx.status()
 if noAudio == 0 then
 	label({
-		Text = "No audio uploaded yet - run tools/upload_audio.py (see docs/audio.md)",
+		Text = "No audio found yet - drag it into ReplicatedStorage > SBRAudio (see docs/audio.md)",
 		Font = Enum.Font.GothamMedium,
 		TextScaled = false,
 		TextSize = 12,

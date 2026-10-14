@@ -11,8 +11,20 @@ local Sfx = require(Shared.Sfx)
 local Feel = require(script.Parent.Feel)
 
 Sfx.init()
-local have, total = Sfx.status()
-print(("[SBR audio] %d/%d sounds have a Roblox asset id%s"):format(have, total, have == 0 and " - see docs/audio.md to upload them" or ""))
+-- Report what was found once Studio has had a moment to load the SBRAudio folder.
+task.delay(3, function()
+	local have, total = Sfx.status()
+	if have == total then
+		print(("[SBR audio] all %d sounds ready"):format(total))
+		return
+	end
+	local missing = Sfx.missing()
+	local shown = table.concat(missing, ", ", 1, math.min(#missing, 8))
+	print(("[SBR audio] %d/%d sounds ready. Missing: %s%s"):format(have, total, shown, #missing > 8 and ", ..." or ""))
+	if have == 0 then
+		print("[SBR audio] Drag the imported audio into ReplicatedStorage > SBRAudio (see docs/audio.md).")
+	end
+end)
 
 -- ---- title ------------------------------------------------------------------------------------
 Sfx.setMusic("theme_title", 2.5)
